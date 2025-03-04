@@ -11,7 +11,7 @@ function TopDoctors() {
         <p className='text-center text-sm sm:w-1/2'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vel, atque.</p>
         <div className='w-full grid grid-cols-5 gap-4 pt-5 gap-y-6 px-3 sm:px-6 rounded-2xl'>
             {
-                doctors.map((items,index)=>(
+                doctors.slice(0,5).map((items,index)=>(
                     <div key={index} onClick={()=>navigate(`/appointment/${items._id}`)} className='border border-blue-500 overflow-hidden cursor-pointer hover:scale-105 transform transition-all duration-300 rounded-2xl'>
                         <img src={items.image} alt="" className='bg-blue-50' />
                         <div className='p-4'>
