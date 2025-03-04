@@ -1,1 +1,9 @@
 @import "tailwindcss";
+.flex {
+    -ms-overflow-style: none;  /* For Internet Explorer 10+ */
+    scrollbar-width: none;      /* For Firefox */
+  }
+  
+  .flex::-webkit-scrollbar {
+    display: none;  /* For Chrome, Safari, and Opera */
+  }
