@@ -12,7 +12,8 @@ app.use(cors({
 }
 ))
 
-
+import adminRouter from './routes/admin.routes.js';
+app.use('/api/v1/admin', adminRouter);
 
 
 

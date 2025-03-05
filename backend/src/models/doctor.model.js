@@ -36,7 +36,7 @@ const doctorSchema = new mongoose.Schema({
     },
     available:{
         type: Boolean,
-        required: true,
+        default: true
     },
     fees:{
         type: Number,
@@ -54,4 +54,25 @@ const doctorSchema = new mongoose.Schema({
         type:Object,
         default:{}
     }
-},{timestamps: true});
+},{timestamps: true,minimize: false});
+
+// If you define a schema like this:
+// const doctorSchema = new mongoose.Schema({
+//     name: String,
+//     slots_booked: Object
+// });
+// const Doctor = mongoose.model("Doctor", doctorSchema);
+
+// const doc = new Doctor({ name: "Dr. Smith", slots_booked: {} });
+// await doc.save();
+// Result in MongoDB:
+// {
+//     "_id": "someObjectId",
+//     "name": "Dr. Smith",
+//     "__v": 0
+// }
+// 👉 slots_booked: {} was removed because it's an empty object.
+
+//so my minize: false will keep the empty object in the database
+
+export const Doctor = mongoose.model('Doctor', doctorSchema);
