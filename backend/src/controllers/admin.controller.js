@@ -77,7 +77,10 @@ const adminLogin = asyncHandler(async(req,res)=>{
         return res.status(200).cookie('token',token,options).json(new ApiResponse(200,{token},"Admin logged in successfully"))
 
     }else{
-        throw new ApiError(400,'Invalid email or password')
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid email or password'
+          });
     }
 })
 
