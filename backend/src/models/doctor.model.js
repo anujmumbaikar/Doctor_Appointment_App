@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 const doctorSchema = new mongoose.Schema({
     name:{
         type: String,
@@ -74,5 +75,14 @@ const doctorSchema = new mongoose.Schema({
 // 👉 slots_booked: {} was removed because it's an empty object.
 
 //so my minize: false will keep the empty object in the database
-
+doctorSchema.pre('save',async function(next){
+    if(!this.isModified('password')){
+        return next();
+    }
+    this.password = await bcrypt.hash(this.password,10);
+    next();
+})
+doctorSchema.methods.isPasswordCorrect =  async function(password){
+    return await bcrypt.compare(password,this.password);
+}
 export const Doctor = mongoose.model('Doctor', doctorSchema);
