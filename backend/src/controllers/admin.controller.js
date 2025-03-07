@@ -5,6 +5,8 @@ import {Doctor} from '../models/doctor.model.js'
 import ApiError from '../utils/ApiError.js'
 import ApiResponse from '../utils/ApiResponse.js'
 import jwt from 'jsonwebtoken'
+
+//api for adding doctor by admin
 const addDoctor = asyncHandler(async(req,res)=>{
     const {name,email,password,speciality,degree,about,fees,address,experience} = req.body
     if(!name || !email || !password || !speciality || !degree || !about || !fees || !address || !experience){
@@ -52,6 +54,8 @@ const addDoctor = asyncHandler(async(req,res)=>{
     }
     return res.status(200).json(new ApiResponse(200,{},"Doctor created successfully"))
 })
+
+//api for admin login
 const adminLogin = asyncHandler(async(req,res)=>{
     const {email,password} = req.body
     if(!email || !password){
@@ -83,6 +87,15 @@ const adminLogin = asyncHandler(async(req,res)=>{
           });
     }
 })
+//api for all doctors data for admin panel
+const allDoctors = asyncHandler(async(req,res)=>{
+    const doctors = await Doctor.find({}).select('-password')
+    if(!doctors){
+        throw new ApiError(500,'Error occur while fetching doctors data')
+    }
+    return res.status(200).json(new ApiResponse(200,{doctors},"All doctors data fetched successfully"))
+
+})
 
 
-export {addDoctor,adminLogin}
+export {addDoctor,adminLogin,allDoctors}

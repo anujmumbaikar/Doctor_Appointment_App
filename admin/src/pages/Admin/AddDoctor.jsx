@@ -62,10 +62,22 @@ const {backendurl,adminToken} = useContext(AdminContext)
       
       if(data.success){
         toast.success(data.message)
+        setDocImg(false) 
+        setName("")
+        setEmail("")
+        setPassword("")
+        setExperience("1 Year")
+        setFees("")
+        setSpeciality("General physician")
+        setDegree("")
+        setAddress1("")
+        setAddress2("") 
       }else{
         toast.error(data.message)
       }
     } catch (error) {
+      toast.error(error.response.data.message)
+      console.log(error);
       
     }
 
@@ -154,3 +166,5 @@ const {backendurl,adminToken} = useContext(AdminContext)
 }
 
 export default AddDoctor;
+
+

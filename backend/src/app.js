@@ -14,10 +14,7 @@ app.use(cors({
 ))
 
 import adminRouter from './routes/admin.routes.js';
+import doctorRouter from './routes/doctor.routes.js';
 app.use('/api/v1/admin', adminRouter);
-
-
-
-app.use(cookieParser());
-
+app.use('/api/v1/doctor', doctorRouter);
 export { app };
