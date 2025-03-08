@@ -25,11 +25,9 @@ function Login() {
         }else{
           toast.error(data.message)
         }
-      }
-      if(state === 'Login'){
-        const {data} = await axios.post(`${backendUrl}/api/v1/user/login`,{email,password})
+      }else{
+        const {data} = await axios.post(`${backendUrl}/api/v1/user/logn`,{email,password})
         console.log(data);
-        
         if(data.success){
           localStorage.setItem('token',data.token)
           setToken(data.token)
@@ -39,9 +37,8 @@ function Login() {
         }
       }
     } catch (error) {
-      
+      toast.error(error.message)
     }
-
   };
 
   return (
