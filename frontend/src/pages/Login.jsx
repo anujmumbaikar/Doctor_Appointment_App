@@ -10,28 +10,27 @@ function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const {backendUrl,token,setToken} = useContext(AppContext)
+  const {backendUrl,accessToken,setAccessToken} = useContext(AppContext)
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if(state === 'Sign Up'){
         const {data} = await axios.post(`${backendUrl}/api/v1/user/register`,{name,email,password})
-        console.log(data);
-        
         if(data.success){
-          localStorage.setItem('token',data.token)
-          setToken(data.token)
-          toast.success(data.message)
+          localStorage.setItem('accessToken',data.data.accessToken)
+          setAccessToken(data.data.accessToken)
         }else{
           toast.error(data.message)
         }
-      }else{
-        const {data} = await axios.post(`${backendUrl}/api/v1/user/logn`,{email,password})
+      } else{
+        const {data} = await axios.post(`${backendUrl}/api/v1/user/login`,{email,password})
         console.log(data);
         if(data.success){
-          localStorage.setItem('token',data.token)
-          setToken(data.token)
+          localStorage.setItem('accessToken',data.data.accessToken)
+          setAccessToken(data.data.accessToken)
           toast.success(data.message)
+          navigate('/')
         }else{
           toast.error(data.message)
         }
@@ -93,7 +92,7 @@ function Login() {
         </button>
         {state === "Sign Up" ? (
           <p>
-            Already have an account?{" "}
+            Already have an account?
             <span
               onClick={() => setState("Login")}
               className="text-blue-600 underline cursor-pointer"
@@ -103,7 +102,7 @@ function Login() {
           </p>
         ) : (
           <p>
-            Don't have an account?{" "}
+            Don't have an account?
             <span
               onClick={() => setState("Sign Up")}
               className="text-blue-600 underline cursor-pointer"

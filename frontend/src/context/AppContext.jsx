@@ -8,10 +8,7 @@ export const AppContext = createContext()
 const AppContextProvider = ({children})=>{
     const currencySymbol = '$' 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
-    console.log(backendUrl);
-    
-
-    const [token,setToken] = useState('')
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || false);
     const [doctors, setDoctors] = useState([])
     const getDoctorsData = async ()=>{
         try{
@@ -27,15 +24,12 @@ const AppContextProvider = ({children})=>{
         }
     }
     const value = {
-        doctors,currencySymbol,token,setToken,backendUrl
+        doctors,currencySymbol,accessToken,setAccessToken,backendUrl
     
     }
     useEffect(()=>{
         getDoctorsData()
     },[])
-
-
-
     return(
         <AppContext.Provider value={value}>
             {children}
