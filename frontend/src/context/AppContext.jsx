@@ -8,13 +8,11 @@ export const AppContext = createContext()
 const AppContextProvider = ({children})=>{
     const currencySymbol = '$' 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-
-    const [doctors, setDoctors] = useState([])
-    const value = {
-        doctors,currencySymbol
+    console.log(backendUrl);
     
-    }
+
+    const [token,setToken] = useState('')
+    const [doctors, setDoctors] = useState([])
     const getDoctorsData = async ()=>{
         try{
             const {data} = await axios.get(`${backendUrl}/api/v1/doctor/list`)
@@ -27,6 +25,10 @@ const AppContextProvider = ({children})=>{
             console.log(error)
             toast.error(error.message)
         }
+    }
+    const value = {
+        doctors,currencySymbol,token,setToken,backendUrl
+    
     }
     useEffect(()=>{
         getDoctorsData()
