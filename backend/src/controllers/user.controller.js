@@ -5,7 +5,7 @@ import validator from 'validator'
 import {User} from '../models/user.model.js'
 import {uploadOnCloudinary} from '../utils/cloudinary.js'
 import {Doctor} from '../models/doctor.model.js'
-import multer from 'multer'
+import {Appointment} from '../models/appointment.model.js'
 const generateAccessToken = async(userID)=>{
     const user = await User.findById(userID)
     if(!user){
@@ -132,7 +132,46 @@ const bookAppointment = asyncHandler(async(req,res)=>{
     if(!docData.available){
         return res.status(400).json(new ApiResponse(400,{},"Doctor is not available"))
     }
+    let slots_booked = docData.slots_booked
+    //checking for slot availability
+    if(slots_booked[slotDate]){
+        if(slots_booked[slotDate].includes(slotTime)){
+            return res.status(400).json(new ApiResponse(400,{},"Slot not available"))
+        }else{
+            slots_booked[slotDate].push(slotTime)
+        }
+    }else{
+        slots_booked[slotDate] = []
+        slots_booked[slotDate].push(slotTime)
+    }
+    const userData = await User.findById(req.user._id).select("-password")
+    delete docData.slots_booked
+    const appointment = await Appointment.create({
+        docId,
+        userId:req.user._id,
+        docData,
+        userData,
+        slotDate,
+        amount:docData.fees,
+        slotTime,
+        date:Date.now()
+    })
+    if(!appointment){
+        return res.status(400).json(new ApiResponse(400,{},"Appointment not booked"))
+    }
+
+    //save new slots data in docData
+    await Doctor.findByIdAndUpdate(
+        docId,
+        {
+            $set:{
+                slots_booked
+            }
+        },
+        {new:true}
+    )
+    return res.status(200).json(new ApiResponse(200,appointment,"Appointment booked successfully"))
 
 })
 
-export {registerUser,login,logout,getUserProfileData,updateUserProfile}
+export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment}
