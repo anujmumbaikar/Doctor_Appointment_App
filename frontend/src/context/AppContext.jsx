@@ -10,6 +10,7 @@ const AppContextProvider = ({children})=>{
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || false);
     const [doctors, setDoctors] = useState([])
+    const [userData, setUserData] = useState(false)
     const getDoctorsData = async ()=>{
         try{
             const {data} = await axios.get(`${backendUrl}/api/v1/doctor/list`)
@@ -23,13 +24,40 @@ const AppContextProvider = ({children})=>{
             toast.error(error.message)
         }
     }
-    const value = {
-        doctors,currencySymbol,accessToken,setAccessToken,backendUrl
-    
-    }
     useEffect(()=>{
         getDoctorsData()
     },[])
+
+    const loadUserProfileData = async()=>{
+        try {
+            const {data} = await axios.get(`${backendUrl}/api/v1/user/my-profile`,{
+                headers:{
+                    Authorization: `Bearer ${accessToken}`
+                }})
+            if(data.success){
+                setUserData(data.data)
+            }else{
+                toast.error(data.message)
+                console.log(data.message);
+                
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    useEffect(()=>{
+        if(accessToken){
+            loadUserProfileData()
+        }else{
+            setUserData(false)
+        }
+    },[accessToken])
+
+    const value = {
+        doctors,currencySymbol,accessToken,setAccessToken,backendUrl,userData,setUserData,loadUserProfileData
+    
+    }
+
     return(
         <AppContext.Provider value={value}>
             {children}

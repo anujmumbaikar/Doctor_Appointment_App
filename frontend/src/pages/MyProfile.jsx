@@ -1,23 +1,57 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import { assets } from "../assets/assets.js";
+import { useContext,useState } from "react";
+import { AppContext } from "../context/AppContext";
+import { assets } from "../assets/assets";
+import { toast } from "react-toastify";
+import axios from "axios";
 function MyProfile() {
-  const [userData, setUserData] = React.useState({
-    name: "Anuj Mumbaikar",
-    image: assets.profile_pic,
-    email: "anujmumbaikar120405@gmail.com",
-    phone: "9000000000",
-    address: {
-      line1: "57th Cross,Richmond Road",
-      line2: "BKC,Mumbai",
-    },
-    gender: "Male",
-    dob: "12/04/2000",
-  });
-  const [isEdit, setIsEdit] = React.useState(false);
-  return (
+  const {backendUrl,accessToken,userData, setUserData,loadUserProfileData} = useContext(AppContext);
+  const [isEdit, setIsEdit] = useState(false);
+  const [image, setImage] = useState(false);
+
+  const updateUserProfile = async()=>{
+    try {
+      const formData = new FormData()
+      formData.append('name',userData.name)
+      formData.append('phone',userData.phone)
+      formData.append('address',JSON.stringify(userData.address))
+      formData.append('gender',userData.gender)
+      formData.append('dob',userData.dob)
+      image && formData.append('image',image)
+      const {data} = await axios.post(`${backendUrl}/api/v1/user/update-profile`,formData,{
+        headers:{
+          'Content-Type':'multipart/form-data',
+          Authorization:`Bearer ${accessToken}`
+        },
+      })
+      if(data.success){
+        toast.success(data.message)
+        setIsEdit(false)
+        setImage(false)
+        await loadUserProfileData()
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+  }
+
+  return userData && (
     <div className="max-w-lg flex flex-col gap-2 text-sm">
-      <img  className="w-36 rounded" src={userData.image} alt="" />
+      {
+        isEdit ?
+        <label htmlFor="image">
+          <div className="inline-block cursor-pointer relative">
+            <img className="w-36 rounded opacity-50 hover:opacity-100" src={image ? URL.createObjectURL(image) : userData.image} alt="" />
+            <img className="w-10 absolute bottom-12 right-12" src={image ? null : assets.upload_icon} alt="" />
+          </div>
+          <input onChange={(e)=>setImage(e.target.files[0])} type="file" id="image" hidden/>
+        </label>
+        :
+        <img  className="w-36 rounded" src={userData.image} alt="" />
+      }
       {isEdit ? (
         <input
         className="bg-gray-50 text-3xl font-medium max-w-60 mt-4"
@@ -35,19 +69,7 @@ function MyProfile() {
         <p className="text-neutral-500 underline mt-3">CONTACT INFORMATION</p>
         <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-800">
           <p className="font-medium">Email id:</p>
-          {isEdit ? (
-            <input
-            className="bg-gray-100"
-              type="text"
-              value={userData.email}
-              onChange={(e) =>
-                setUserData((prev) => ({ ...prev, email: e.target.value }))
-              }
-            />
-          ) : (
-            <p className="text-blue-500">{userData.email}</p>
-          )}
-
+          <p className="text-blue-500">{userData.email}</p>
           <p className="font-medium">Phone:</p>
           {isEdit ? (
             <input 
@@ -123,7 +145,10 @@ function MyProfile() {
       </div>
       <div className="mt-10">{
         
-        isEdit ? <button className="border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white duration-300" onClick={()=>setIsEdit(false)}>Save information</button> : <button className="border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white duration-300" onClick={()=>setIsEdit(true)}>Edit</button>
+        isEdit ? 
+        <button className="border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white duration-300" onClick={updateUserProfile}>Save information</button> 
+        : 
+        <button className="border border-blue-500 px-8 py-2 rounded-full hover:bg-blue-500 hover:text-white duration-300" onClick={()=>setIsEdit(true)}>Edit</button>
       }
       </div>
     </div>

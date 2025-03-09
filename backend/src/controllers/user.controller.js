@@ -3,6 +3,9 @@ import ApiError from '../utils/ApiError.js'
 import ApiResponse from '../utils/ApiResponse.js'
 import validator from 'validator'
 import {User} from '../models/user.model.js'
+import {uploadOnCloudinary} from '../utils/cloudinary.js'
+import {Doctor} from '../models/doctor.model.js'
+import multer from 'multer'
 const generateAccessToken = async(userID)=>{
     const user = await User.findById(userID)
     if(!user){
@@ -83,4 +86,53 @@ const logout = asyncHandler(async(req,res)=>{
     return res.status(200).clearCookie('accessToken',options)
     .json(new ApiResponse(200,{},"User logged out successfully"))
 })
-export {registerUser,login,logout}
+const getUserProfileData = asyncHandler(async(req,res)=>{
+    const user = await User.findById(req.user._id).select("-password")
+    if(!user){
+        throw new ApiError(400,"User not found")
+    }
+    return res.status(200).json(new ApiResponse(200,user,"User profile data"))
+})
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const { name, phone, address, dob, gender } = req.body;
+    if (!name || !phone || !dob || !gender) {
+        throw new ApiError(400, "Please fill all fields");
+    }
+    if (!req.file) {
+        throw new ApiError(400, 'No image file uploaded');
+    }
+    const imageFilePath = req.file.path;
+    const imageResponse = await uploadOnCloudinary(imageFilePath);
+    
+    if (!imageResponse) {
+        throw new ApiError(500, 'Image not uploaded');
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                image: imageResponse.secure_url, // Use Cloudinary URL
+                name,
+                phone,
+                address: JSON.parse(address),
+                dob,
+                gender,
+            }
+        },
+        { new: true }
+    );
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    } 
+    return res.status(200).json(new ApiResponse(200, user, "User profile updated successfully"));
+});
+const bookAppointment = asyncHandler(async(req,res)=>{
+    const {docId,slotDate,slotTime} = req.body
+    const docData = await Doctor.findById(docId).select("-password")
+    if(!docData.available){
+        return res.status(400).json(new ApiResponse(400,{},"Doctor is not available"))
+    }
+
+})
+
+export {registerUser,login,logout,getUserProfileData,updateUserProfile}
