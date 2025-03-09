@@ -173,5 +173,12 @@ const bookAppointment = asyncHandler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200,appointment,"Appointment booked successfully"))
 
 })
+const getMyAppointments = asyncHandler(async(req,res)=>{
+    const appointments = await Appointment.find({userId:req.user._id})
+    if(!appointments){
+        return res.status(400).json(new ApiResponse(400,{},"No appointments found"))
+    }
+    return res.status(200).json(new ApiResponse(200,appointments,"Appointments found"))
+})
 
-export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment}
+export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment,getMyAppointments}

@@ -3,9 +3,11 @@ import { doctors } from '../assets/assets'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 export const AppContext = createContext()
 
 const AppContextProvider = ({children})=>{
+    const navigate = useNavigate()
     const currencySymbol = '$' 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || false);
@@ -54,7 +56,7 @@ const AppContextProvider = ({children})=>{
     },[accessToken])
 
     const value = {
-        doctors,currencySymbol,accessToken,setAccessToken,backendUrl,userData,setUserData,loadUserProfileData
+        doctors,getDoctorsData,currencySymbol,accessToken,setAccessToken,backendUrl,userData,setUserData,loadUserProfileData,
     
     }
 
