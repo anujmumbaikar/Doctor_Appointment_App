@@ -1,6 +1,6 @@
 import express from 'express';
 import { Router } from 'express';
-import { registerUser,login,logout,getUserProfileData,cancelAppointment,updateUserProfile,bookAppointment ,getMyAppointments} from '../controllers/user.controller.js';
+import { registerUser,login,logout,getUserProfileData,cancelAppointment,updateUserProfile,bookAppointment ,getMyAppointments,paymentRazorpay,verifyRazorpayPayment} from '../controllers/user.controller.js';
 import { verifyUser } from '../middlewares/userAuth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
 const router = Router();
@@ -12,5 +12,7 @@ router.route('/update-profile').post(verifyUser,upload.single('image'),updateUse
 router.route('/book-appointment').post(verifyUser,bookAppointment)
 router.route('/my-appointments').get(verifyUser,getMyAppointments)
 router.route('/cancel-appointment').post(verifyUser,cancelAppointment)
+router.route('/payment-razorpay').post(verifyUser,paymentRazorpay)
+router.route('/verify-razorpay-payment').post(verifyUser,verifyRazorpayPayment)
 
 export default router;
