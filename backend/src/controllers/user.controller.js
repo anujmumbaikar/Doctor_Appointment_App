@@ -180,5 +180,36 @@ const getMyAppointments = asyncHandler(async(req,res)=>{
     }
     return res.status(200).json(new ApiResponse(200,appointments,"Appointments found"))
 })
+const cancelAppointment = asyncHandler(async(req,res)=>{
+    const {appointmentId} = req.body
+    const appointmentData = await Appointment.findById(appointmentId)
+    if(appointmentData.userId != req.user._id){
+        return res.status(400).json(new ApiResponse(400,{},"You are not authorized to cancel this appointment"))
+    }
+    await Appointment.findByIdAndUpdate(
+        appointmentId,
+        {
+            $set:{
+                cancelled:true
+            }
+        },
+        {new:true}
+    )
+    //releasing doctor slot
+    const {docId,slotDate,slotTime} = appointmentData
+    const docData = await Doctor.findById(docId)
+    let slots_booked = docData.slots_booked
+    slots_booked[slotDate] = slots_booked[slotDate].filter(slot=>slot!=slotTime)
+    await Doctor.findByIdAndUpdate(
+        docId,
+        {
+            $set:{
+                slots_booked
+            }
+        },
+        {new:true}
+    )
+    return res.status(200).json(new ApiResponse(200,{},"Appointment cancelled successfully"))
+})
 
-export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment,getMyAppointments}
+export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment,getMyAppointments,cancelAppointment}

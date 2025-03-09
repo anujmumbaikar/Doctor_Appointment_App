@@ -5,8 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 function MyAppointments() {
-  const { doctors, accessToken, backendUrl } = useContext(AppContext);
-  const [appointments, setAppointments] = useState([]); // ✅ Default empty array
+  const { doctors, accessToken, backendUrl,getDoctorsData } = useContext(AppContext);
+  const [appointments, setAppointments] = useState([]);
 
   const getMyAppointments = async () => {
     try {
@@ -15,11 +15,8 @@ function MyAppointments() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(data);
-
       if (data.success) {
-        toast.success(data.message);
-        setAppointments(data.data); // ✅ Fix: Use `data.data` instead of `data.appointments`
+        setAppointments(data.data);
       } else {
         toast.error(data.message);
       }
@@ -29,6 +26,27 @@ function MyAppointments() {
     }
   };
 
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/v1/user/cancel-appointment`,{appointmentId},{
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log(data);
+      
+      if (data.success) {
+        toast.success(data.message);
+        getMyAppointments();
+        getDoctorsData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error.message);
+    }
+  }
   useEffect(() => {
     if (accessToken) {
       getMyAppointments();
@@ -60,12 +78,15 @@ function MyAppointments() {
                 </p>
               </div>
               <div className="flex flex-col justify-end gap-2">
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300">
+                {!items.cancelled && <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300">
                   Pay Online
                 </button>
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-red-400 hover:text-white transition-all duration-300">
+                }
+                {!items.cancelled && <button onClick={()=>cancelAppointment(items._id)} className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded-lg hover:bg-red-400 hover:text-white transition-all duration-300">
                   Cancel Appointment
                 </button>
+                }
+                {items.cancelled && <p className="text-sm text-red-500 text-center">Appointment Cancelled</p>}
               </div>
             </div>
           ))}
