@@ -8,6 +8,7 @@ function MyAppointments() {
   const { doctors, accessToken, backendUrl,getDoctorsData } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
   const naviagte = useNavigate();
+  
   const getMyAppointments = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/v1/user/my-appointments`, {
@@ -16,8 +17,6 @@ function MyAppointments() {
         },
       });
       if (data.success) {
-        console.log(data.data);
-        
         setAppointments(data.data);
       } else {
         toast.error(data.message);
@@ -47,7 +46,6 @@ function MyAppointments() {
       console.log(error.message);
     }
   }
-
 
   const initPay = (order) => {
     const options = {

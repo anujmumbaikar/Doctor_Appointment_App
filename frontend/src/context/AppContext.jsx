@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 export const AppContext = createContext()
 
 const AppContextProvider = ({children})=>{
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const currencySymbol = '$' 
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || false);
@@ -25,6 +25,7 @@ const AppContextProvider = ({children})=>{
             console.log(error)
             toast.error(error.message)
         }
+        
     }
     useEffect(()=>{
         getDoctorsData()
