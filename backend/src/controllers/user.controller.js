@@ -7,6 +7,7 @@ import {uploadOnCloudinary} from '../utils/cloudinary.js'
 import {Doctor} from '../models/doctor.model.js'
 import {Appointment} from '../models/appointment.model.js'
 import razorpay from 'razorpay'
+
 const generateAccessToken = async(userID)=>{
     const user = await User.findById(userID)
     if(!user){
@@ -28,7 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if(!validator.isEmail(email)){
         throw new ApiError(400,'Invalid email')
     }
-    if(password.length < 6){
+    if(password.length < 5){
         throw new ApiError(400,'Password must be at least 6 characters')
     }
     // Register user
