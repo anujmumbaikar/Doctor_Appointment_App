@@ -215,44 +215,45 @@ const cancelAppointment = asyncHandler(async(req,res)=>{
 })
 
 //Api to make payment to appointment using razorpay
-const razorpayInstance = new razorpay({
-    key_id:process.env.RAZORPAY_KEY_ID,
-    key_secret:process.env.RAZORPAY_KEY_SECRET
-})
-const paymentRazorpay = asyncHandler(async(req,res)=>{
-    const {appointmentId} = req.body
-    const appointmentData = await Appointment.findById(appointmentId)
-    if(!appointmentData || appointmentData.cancelled){
-        return res.status(400).json(new ApiResponse(400,{},"Appointment not found"))
-    }
-    //creating options of razorpay
-    const options = {
-        amount:appointmentData.amount*100,
-        currency:"INR",
-        receipt:appointmentId
-    }
-    //creating order
-    const order = await razorpayInstance.orders.create(options)
-    res.status(200).json(new ApiResponse(200,order,"Order created successfully"))
-})
-const verifyRazorpayPayment = asyncHandler(async(req,res)=>{
-    const {razorpay_order_id} = req.body
-    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
-    if(orderInfo.status == "paid"){
-        await Appointment.findByIdAndUpdate(
-            orderInfo.receipt,
-            {
-                $set:{
-                    payment:true
-                }
-            },
-            {new:true}
-        )
-        return res.status(200).json(new ApiResponse(200,{},"Payment successfull"))
-    }else{
-        return res.status(400).json(new ApiResponse(400,{},"Payment failed"))
-    }
+// const razorpayInstance = new razorpay({
+//     key_id:process.env.RAZORPAY_KEY_ID,
+//     key_secret:process.env.RAZORPAY_KEY_SECRET
+// })
+// const paymentRazorpay = asyncHandler(async(req,res)=>{
+//     const {appointmentId} = req.body
+//     const appointmentData = await Appointment.findById(appointmentId)
+//     if(!appointmentData || appointmentData.cancelled){
+//         return res.status(400).json(new ApiResponse(400,{},"Appointment not found"))
+//     }
+//     //creating options of razorpay
+//     const options = {
+//         amount:appointmentData.amount*100,
+//         currency:"INR",
+//         receipt:appointmentId
+//     }
+//     //creating order
+//     const order = await razorpayInstance.orders.create(options)
+//     res.status(200).json(new ApiResponse(200,order,"Order created successfully"))
+// })
+// const verifyRazorpayPayment = asyncHandler(async(req,res)=>{
+//     const {razorpay_order_id} = req.body
+//     const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
+//     if(orderInfo.status == "paid"){
+//         await Appointment.findByIdAndUpdate(
+//             orderInfo.receipt,
+//             {
+//                 $set:{
+//                     payment:true
+//                 }
+//             },
+//             {new:true}
+//         )
+//         return res.status(200).json(new ApiResponse(200,{},"Payment successfull"))
+//     }else{
+//         return res.status(400).json(new ApiResponse(400,{},"Payment failed"))
+//     }
     
-})
+// })
 
-export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment,getMyAppointments,cancelAppointment,paymentRazorpay,verifyRazorpayPayment}
+export {registerUser,login,logout,getUserProfileData,updateUserProfile,bookAppointment,getMyAppointments,cancelAppointment}
+// export {paymentRazorpay,verifyRazorpayPayment}
